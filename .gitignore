@@ -5,3 +5,7 @@ __MACOSX/
 # 依赖与日志
 node_modules/
 *.log
+
+# Java 构建产物
+target/
+*.class

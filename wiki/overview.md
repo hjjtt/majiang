@@ -1,75 +1,77 @@
 ---
 type: overview
 title: 抖音麻将小游戏项目综述
-description: 项目整体状态、技术选型方向与待定问题
+description: 项目整体状态、技术选型、架构与下一步方向
 tags: [douyin, minigame, mahjong, cocos, java, netty]
 sources: []
-updated: 2026-07-11
+updated: 2026-07-12
 ---
 
 # 项目综述
 
 ## 一句话定位
-为抖音小游戏平台开发一款**麻将**对战游戏，目前处于空白模板阶段，尚未开始实际游戏逻辑开发。
+为抖音小游戏平台开发一款**麻将**对战游戏，支持联网真人对战与人机对战。当前后端骨架 + 通信协议已搭建完成，前端待搭。
 
-## 当前状态（2026-07-11）
+## 当前状态（2026-07-12）
 
 | 项 | 值 |
 |---|---|
 | 项目名 | `majiang` |
-| 平台类型 | 抖音原生小游戏（`douyinProjectType: "native"`） |
+| 平台 | 抖音原生小游戏（`douyinProjectType: "native"`），竖屏 |
 | AppID | `tt36cc4071a8a9d2e702` |
-| 屏幕方向 | 竖屏 `portrait` |
-| 代码现状 | `majiang/game.js` 为官方空白模板（36 行），仅绘制背景文字与 `icon.png` |
-| 运行时 API | `tt.*` 全局对象（`tt.getSystemInfoSync` / `tt.createCanvas` / `tt.createImage`），无 DOM |
+| 仓库 | https://github.com/hjjtt/majiang |
+| 后端 | ✅ 骨架完成（Java 17 + Netty 4.1.133 + Maven），编译通过、WebSocket 监听 `9000/ws` |
+| 协议 | ✅ v1 定义完成（见 [[summary-protocol-v1]]） |
+| 前端 | ⏳ Cocos Creator 项目待建（需编辑器），TS 逻辑层待搭 |
+| 麻将规则 | ⏳ 未定（骨架用 `DefaultMahjongRule` 占位，`canHu` 恒 false） |
 
 ## 目录结构
 ```
-D:\vis\douyin\majiang\          # 项目根
-├── wiki\                       # wiki 根（本文件所在）
-│   ├── index.md                # wiki 目录
-│   ├── log.md                  # wiki 时间线
-│   ├── overview.md             # 本文件
-│   └── raw\                    # 原始材料（待首次 ingest 创建）
-├── __MACOSX\                   # macOS zip 残留（建议删除）
-└── majiang\                    # 抖音开发者工具识别的小游戏项目
-    ├── game.js                 # 入口（模板代码）
-    ├── game.json               # 屏幕方向配置
-    ├── project.config.json     # 开发者工具项目配置
-    └── icon.png                # 应用图标
+D:\vis\douyin\majiang\
+├── wiki\                       # 知识库
+├── protocol\                   # 前后端通信契约
+│   └── messages.md
+├── server\                     # 后端（Java/Netty/Maven）
+│   ├── pom.xml
+│   └── src/main/java/com/hjjtt/majiang/
+│       ├── Bootstrap.java          # 入口
+│       ├── netty/                  # WebSocket 服务 + 消息分发
+│       ├── message/                # Message 信封 + MessageType
+│       ├── game/                   # Player / Game / MahjongRule 抽象
+│       ├── player/                 # HumanPlayer / AiPlayer
+│       └── room/                   # RoomManager 匹配
+└── majiang\                    # 抖音小游戏代码（空白模板，将被 Cocos 项目替代）
 ```
 
-## 技术选型方向（讨论中）
+## 架构核心
 
-### 前端引擎：倾向 Cocos Creator
-抖音小游戏对前端引擎的选择有强约束（运行时非浏览器 DOM，基于 Canvas/WebGL）。在支持抖音小游戏导出的引擎中：
+### 1. 服务端权威
+洗牌、发牌、判胡、计分、防作弊全部在 Java 后端。客户端只展示与上报操作，任何上报都经服务端校验。
 
-- **Cocos Creator 3.x** ✅ 首选 —— 官方适配、2D 能力强（麻将即 2D）、TypeScript、跨平台（抖音/微信/H5）
-- **LayaAir** —— 国产，支持好但生态弱于 Cocos
-- **Egret（白鹭）** ❌ 2022 年已停止维护，不选
-- **原生 Canvas** ❌ 仅适合极简 demo，做麻将 UI/动画成本过高
+### 2. Player 统一抽象（人/AI 复用）
+`Player` 接口统一真人与 AI：`HumanPlayer` 走 WebSocket，`AiPlayer` 是进程内 Bot。牌桌 `Game` 对两者透明——**人机 = 1 真人 + 3 AI，联网 = 4 真人，复用同一套牌桌逻辑**。详见 [[concept-player-abstraction]]。
 
-详见未来页面 [[entity-cocos-creator]]、[[concept-douyin-minigame]]。
+### 3. 通信
+WebSocket（前端 `tt.connectSocket` ↔ 后端 Netty）+ JSON 信封，13 类消息见 [[summary-protocol-v1]]。
 
-### 后端：Java + Netty
-后端语言与前端的耦合点在**通信方式**，而非引擎选择：
+## 技术栈
+| 层 | 选型 |
+|---|---|
+| 前端引擎 | Cocos Creator 3.x（项目待建；当前 `majiang/` 为抖音原生空白模板） |
+| 前端语言 | TypeScript |
+| 后端 | Java 17 + Netty 4.1.133 + Jackson + Logback |
+| 构建 | Maven（`mvn compile exec:java`） |
+| 协议 | WebSocket + JSON（量大后切 Protobuf） |
 
+## 待定 / 下一步
+1. **前端 TS 层**：搭 `client-ts/`（`tt.connectSocket` 封装 + 协议类型 + 状态管理），随后接入 Cocos 项目
+2. **麻将规则**：四川血战 / 国标 / 推倒胡——确定后实现 `MahjongRule`（替换 `DefaultMahjongRule`）
+3. **牌编码**：统一编码方案（[[concept-tile-encoding]] 待写）
+4. **Cocos 项目**：用 Cocos Dashboard 建项目，导入 TS 层
+
+## 运行
+```bash
+cd server
+mvn compile exec:java                    # 默认端口 9000
+mvn compile exec:java -Dexec.args="8080" # 指定端口
 ```
-前端 (Cocos + TS) ──WebSocket(tt.connectSocket)──► Java/Netty
-                   └─ HTTP (tt.request) ────────────► 登录/匹配/结算
-```
-
-- **Netty** 做 WebSocket Server，Java 实时游戏服务端事实标准
-- **协议**：前期 JSON 快速开发，量大后切 Protobuf
-- **关键原则**：洗牌 / 发牌 / 判胡 / 防作弊逻辑**全部放服务端**，客户端不可信，只负责展示与操作上报
-
-## 待定问题（需要你拍板）
-1. **麻将规则**：四川血战 / 国标 / 推倒胡 / 地方玩法？
-2. **对战模式**：人机（需 AI） / 真人联网 / 两者都要？
-3. **是否最终采用 Cocos Creator**（当前倾向，未确认）
-4. **美术资源**：是否已有牌面/UI 素材，还是需要从零设计？
-
-## 下一步建议
-1. 确认麻将规则与对战模式 → 据此设计服务端牌局状态机
-2. 用 Cocos Creator 初始化前端项目骨架
-3. 定义前后端通信协议（房间/匹配/出牌/胡牌消息格式）
