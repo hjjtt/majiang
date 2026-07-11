@@ -12,10 +12,11 @@
 
 ## 摘要（Summaries）
 - [summary-protocol-v1.md](summary-protocol-v1.md) — WebSocket 通信契约（信封 + 13 类消息）
+- [summary-client-ts.md](summary-client-ts.md) — 前端 TS 逻辑层（协议类型 + 网络封装 + GameClient）
 
 ## 实体（Entities）
 _（暂无）_
 
 ## 元页面
-- [graph.md](graph.md) — 关系网络图（知识页 ≥ 5 后生成，当前 3 页）
+- [graph.md](graph.md) — 关系网络图（知识页 ≥ 5 后生成，当前 4 页）
 - [log.md](log.md) — 时间线日志（追加式）

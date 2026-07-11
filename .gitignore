@@ -9,3 +9,6 @@ node_modules/
 # Java 构建产物
 target/
 *.class
+
+# TS 构建产物
+dist/

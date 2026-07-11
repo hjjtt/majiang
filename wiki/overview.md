@@ -10,7 +10,7 @@ updated: 2026-07-12
 # 项目综述
 
 ## 一句话定位
-为抖音小游戏平台开发一款**麻将**对战游戏，支持联网真人对战与人机对战。当前后端骨架 + 通信协议已搭建完成，前端待搭。
+为抖音小游戏平台开发一款**麻将**对战游戏，支持联网真人对战与人机对战。当前后端骨架、通信协议、前端 TS 逻辑层均已搭建完成，待接入 Cocos Creator。
 
 ## 当前状态（2026-07-12）
 
@@ -22,7 +22,7 @@ updated: 2026-07-12
 | 仓库 | https://github.com/hjjtt/majiang |
 | 后端 | ✅ 骨架完成（Java 17 + Netty 4.1.133 + Maven），编译通过、WebSocket 监听 `9000/ws` |
 | 协议 | ✅ v1 定义完成（见 [[summary-protocol-v1]]） |
-| 前端 | ⏳ Cocos Creator 项目待建（需编辑器），TS 逻辑层待搭 |
+| 前端 | ✅ TS 逻辑层完成（`client-ts/`，`tsc` 编译通过，见 [[summary-client-ts]]）；Cocos 项目待编辑器创建 |
 | 麻将规则 | ⏳ 未定（骨架用 `DefaultMahjongRule` 占位，`canHu` 恒 false） |
 
 ## 目录结构
@@ -31,6 +31,8 @@ D:\vis\douyin\majiang\
 ├── wiki\                       # 知识库
 ├── protocol\                   # 前后端通信契约
 │   └── messages.md
+├── client-ts\                  # 前端 TS 逻辑层（接入 Cocos）
+│   └── src/{protocol,net,game}
 ├── server\                     # 后端（Java/Netty/Maven）
 │   ├── pom.xml
 │   └── src/main/java/com/hjjtt/majiang/
@@ -52,26 +54,29 @@ D:\vis\douyin\majiang\
 `Player` 接口统一真人与 AI：`HumanPlayer` 走 WebSocket，`AiPlayer` 是进程内 Bot。牌桌 `Game` 对两者透明——**人机 = 1 真人 + 3 AI，联网 = 4 真人，复用同一套牌桌逻辑**。详见 [[concept-player-abstraction]]。
 
 ### 3. 通信
-WebSocket（前端 `tt.connectSocket` ↔ 后端 Netty）+ JSON 信封，13 类消息见 [[summary-protocol-v1]]。
+WebSocket（前端 `tt.connectSocket` ↔ 后端 Netty）+ JSON 信封，13 类消息见 [[summary-protocol-v1]]；前端封装见 [[summary-client-ts]]。
 
 ## 技术栈
 | 层 | 选型 |
 |---|---|
 | 前端引擎 | Cocos Creator 3.x（项目待建；当前 `majiang/` 为抖音原生空白模板） |
-| 前端语言 | TypeScript |
+| 前端语言 | TypeScript（`client-ts/`） |
 | 后端 | Java 17 + Netty 4.1.133 + Jackson + Logback |
-| 构建 | Maven（`mvn compile exec:java`） |
+| 构建 | Maven（后端）/ tsc（前端 TS） |
 | 协议 | WebSocket + JSON（量大后切 Protobuf） |
 
 ## 待定 / 下一步
-1. **前端 TS 层**：搭 `client-ts/`（`tt.connectSocket` 封装 + 协议类型 + 状态管理），随后接入 Cocos 项目
-2. **麻将规则**：四川血战 / 国标 / 推倒胡——确定后实现 `MahjongRule`（替换 `DefaultMahjongRule`）
-3. **牌编码**：统一编码方案（[[concept-tile-encoding]] 待写）
-4. **Cocos 项目**：用 Cocos Dashboard 建项目，导入 TS 层
+1. **Cocos Creator 项目**：用 Dashboard 建 3.x 项目，接入 [[summary-client-ts|client-ts]] 层
+2. **前后端联调**：连后端验证 login/match 往返（之前 [SUSPECT] 未端到端测试，client-ts 接入后可一并验证）
+3. **麻将规则**：四川血战 / 国标 / 推倒胡——确定后实现 `MahjongRule`（替换 `DefaultMahjongRule`）
+4. **牌编码**：统一编码方案（[[concept-tile-encoding]] 待写）
 
-## 运行
+## 运行 / 构建
 ```bash
-cd server
-mvn compile exec:java                    # 默认端口 9000
-mvn compile exec:java -Dexec.args="8080" # 指定端口
+# 后端
+cd server && mvn compile exec:java                 # 默认端口 9000
+
+# 前端 TS（类型检查 / 构建）
+cd client-ts && npm install && npm run typecheck   # tsc --noEmit
+                 npm run build                     # 生成 dist/
 ```
