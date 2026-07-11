@@ -1,0 +1,7 @@
+# macOS 解压残留
+__MACOSX/
+.DS_Store
+
+# 依赖与日志
+node_modules/
+*.log

@@ -1,0 +1,15 @@
+{
+    "setting": {
+        "urlCheck": false,
+        "es6": true,
+        "postcss": true,
+        "minified": true,
+        "newFeature": true,
+        "autoCompile": true,
+        "compileHotReLoad": true,
+        "nativeCompile": true
+    },
+    "appid": "tt36cc4071a8a9d2e702",
+    "projectname": "majiang",
+    "douyinProjectType": "native"
+}
