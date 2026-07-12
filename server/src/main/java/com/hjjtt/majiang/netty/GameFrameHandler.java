@@ -1,6 +1,7 @@
 package com.hjjtt.majiang.netty;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hjjtt.majiang.game.Game;
 import com.hjjtt.majiang.message.Message;
 import com.hjjtt.majiang.message.MessageType;
 import com.hjjtt.majiang.player.HumanPlayer;
@@ -13,6 +14,7 @@ import io.netty.util.AttributeKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -47,6 +49,8 @@ public class GameFrameHandler extends SimpleChannelInboundHandler<WebSocketFrame
         switch (msg.getType()) {
             case MessageType.LOGIN -> handleLogin(ctx, msg);
             case MessageType.MATCH -> handleMatch(ctx, msg);
+            case MessageType.DISCARD -> handleDiscard(ctx, msg);
+            case MessageType.CLAIM -> handleClaim(ctx, msg);
             default -> log.warn("未知消息类型: {}", msg.getType());
         }
     }
@@ -72,8 +76,33 @@ public class GameFrameHandler extends SimpleChannelInboundHandler<WebSocketFrame
             mode = String.valueOf(msg.getData().get("mode"));
         }
         RoomManager.MatchResult r = rooms.match(p, mode);
+        p.setRoomId(r.roomId());
         send(ctx, Message.reply(msg.getSeq(), MessageType.MATCH_RESULT,
                 Map.of("roomId", r.roomId(), "seat", r.seat(), "mode", mode)));
+    }
+
+    private void handleDiscard(ChannelHandlerContext ctx, Message msg) {
+        HumanPlayer p = ctx.channel().attr(PLAYER).get();
+        Game g = gameOf(p);
+        if (g == null) return;
+        Object tile = msg.getData() == null ? null : msg.getData().get("tile");
+        if (tile != null) g.discard(p.getSeat(), String.valueOf(tile));
+    }
+
+    @SuppressWarnings("unchecked")
+    private void handleClaim(ChannelHandlerContext ctx, Message msg) {
+        HumanPlayer p = ctx.channel().attr(PLAYER).get();
+        Game g = gameOf(p);
+        if (g == null) return;
+        Object action = msg.getData() == null ? null : msg.getData().get("action");
+        Object tiles = msg.getData() == null ? null : msg.getData().get("tiles");
+        List<String> tileList = tiles instanceof List ? (List<String>) tiles : List.of();
+        if (action != null) g.claim(p.getSeat(), String.valueOf(action), tileList);
+    }
+
+    private Game gameOf(HumanPlayer p) {
+        if (p == null || p.getRoomId() == null) return null;
+        return rooms.find(p.getRoomId());
     }
 
     public static void send(ChannelHandlerContext ctx, Message msg) {

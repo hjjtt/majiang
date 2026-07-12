@@ -33,4 +33,8 @@ public class HumanPlayer implements Player {
     }
 
     public ChannelHandlerContext context() { return ctx; }
+
+    private String roomId;
+    public void setRoomId(String roomId) { this.roomId = roomId; }
+    public String getRoomId() { return roomId; }
 }
