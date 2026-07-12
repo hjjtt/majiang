@@ -31,6 +31,10 @@ public class Game {
     private final List<String>[] hands = new List[4];
     /** 每个座位是否已声明立直。 */
     private final boolean[] riichi = new boolean[4];
+    /** 每个座位最近一次摸到的牌（立直后只能出这张）。 */
+    private final String[] drawnTile = new String[4];
+    /** 每个座位的弃牌（用于振听判定）。 */
+    private final List<String>[] discards = new List[4];
     private int currentSeat = 0;
     private int dealer = 0;
     private static final long ACTION_TIMEOUT_MS = 100L;
@@ -64,7 +68,7 @@ public class Game {
     public synchronized void start() {
         if (!isFull()) { log.warn("[{}] 座位未满", roomId); return; }
         wall = new Wall();
-        for (int i = 0; i < 4; i++) hands[i] = new ArrayList<>();
+        for (int i = 0; i < 4; i++) { hands[i] = new ArrayList<>(); discards[i] = new ArrayList<>(); }
         for (int n = 0; n < 13; n++)
             for (int s = 0; s < 4; s++) hands[s].add(wall.draw());
         hands[dealer].add(wall.draw()); // 庄家先手
@@ -86,6 +90,7 @@ public class Game {
         if (phase != Phase.PLAYING || seat != currentSeat) return;
         String tile = wall.draw();
         if (tile == null) { settle(); return; } // 流局
+        drawnTile[seat] = tile;
         hands[seat].add(tile);
         Collections.sort(hands[seat]);
         seats[seat].send(Message.reply(0, MessageType.DRAW_TILE, Map.of("tile", tile)));
@@ -96,7 +101,14 @@ public class Game {
     /** 出牌（下块接仲裁）。 */
     public synchronized void discard(int seat, String tile) {
         if (phase != Phase.PLAYING || seat != currentSeat) return;
+        // 立直后只能打出刚摸到的牌
+        if (riichi[seat] && drawnTile[seat] != null && !drawnTile[seat].equals(tile)) {
+            seats[seat].send(Message.reply(0, MessageType.ERROR,
+                    Map.of("code", "RIICHI_LOCK", "message", "立直后只能打刚摸到的牌")));
+            return;
+        }
         if (!hands[seat].remove(tile)) return;
+        discards[seat].add(tile);
         for (int s = 0; s < 4; s++)
             seats[s].send(Message.reply(0, MessageType.TILE_DISCARDED,
                     Map.of("seat", seat, "tile", tile)));
@@ -145,6 +157,12 @@ public class Game {
         }
         if (phase != Phase.WAITING_ACTION) return;
         if ("hu".equalsIgnoreCase(action)) {
+            // 振听：自己曾弃过的牌不能荣和
+            if (discards[seat].contains(lastDiscardTile)) {
+                seats[seat].send(Message.reply(0, MessageType.ERROR,
+                        Map.of("code", "FURITEN", "message", "振听：不能荣和曾弃过的牌")));
+                return;
+            }
             List<String> h = new ArrayList<>(hands[seat]);
             h.add(lastDiscardTile);
             if (rule.canHu(h, null) && rule.hasYaku(h, riichi[seat], false, true)) settleWin(seat, false);

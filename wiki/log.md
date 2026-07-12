@@ -72,3 +72,10 @@
 - `Game`：清理四川血战遗留 `missingSuits`；加 `riichi[]` 状态 + `claim("riichi")` 声明；`settleWin` 算分并广播 han/fu/points/yaku
 - 验证：`MahjongTest` 17/17 pass（役 + 点数）；`GameRunTest` 4 AI 跑通一局 SETTLED
 - 待补：杠/碰仲裁、一发/里宝牌/宝牌、符精确计算、平和严格结构校验
+
+## [2026-07-12] update | 后端规则加固（立直强制 + 振听 + 必胡集成测试）
+
+- 立直强制：`drawnTile[seat]` 记录刚摸的牌；`riichi[]` 后 `discard` 只能出该牌，否则 `RIICHI_LOCK` 错误
+- 振听（舍牌振听）：`discards[seat]` 记录每座弃牌；`claim hu` 荣和时若点炮牌在自己弃牌里则 `FURITEN` 拒绝
+- 必胡集成测试 `GameSettleTest`：反射设可控手牌 + `CapturePlayer` 捕获消息，验证 `settleWin -> rule.score -> gameOver` 全链路（4 座均收到 winner/han/fu/points/yaku）
+- 验证：`MahjongTest` 17/17、`GameSettleTest` 1/1、`GameRunTest` 4 AI 跑通 SETTLED
