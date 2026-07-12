@@ -1,0 +1,28 @@
+<view class="page">
+  <view class="mode-bar">
+    <view class="mode-btn {{selectedMode === 4 ? 'on' : ''}}" bindtap="selectMode" data-players="4">四人桌</view>
+    <view class="mode-btn {{selectedMode === 3 ? 'on' : ''}}" bindtap="selectMode" data-players="3">三人桌</view>
+  </view>
+
+  <view class="quick-start" bindtap="startMatch">
+    <view class="qs-text">
+      <view class="qs-title">快速匹配</view>
+      <view class="qs-sub">人机对练 · 立即开局</view>
+    </view>
+    <view class="qs-arrow">›</view>
+  </view>
+
+  <view class="room-list">
+    <view class="room-card" tt:for="{{rooms}}" tt:key="id" bindtap="joinRoom" data-id="{{item.id}}">
+      <view class="room-icon" style="background:{{item.iconBg}}">{{item.icon}}</view>
+      <view class="room-info">
+        <view class="room-name">{{item.name}}</view>
+        <view class="room-meta">{{item.meta}}</view>
+      </view>
+      <view class="room-right">
+        <view class="room-fee">{{item.fee}}</view>
+        <view class="room-seats">{{item.players}}/{{selectedMode}}人</view>
+      </view>
+    </view>
+  </view>
+</view>

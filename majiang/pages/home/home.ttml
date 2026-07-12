@@ -1,0 +1,38 @@
+<view class="page">
+  <view class="hero">
+    <view class="hero-top">
+      <view class="hero-coins">
+        <text class="coin-num">{{coins}}</text>
+        <text class="coin-label">金币</text>
+      </view>
+      <view class="hero-date">{{today}}</view>
+    </view>
+    <view class="hero-title">霓虹立直</view>
+    <view class="hero-sub">日式立直麻将 · 四人对局</view>
+    <view class="hero-actions">
+      <view class="btn-primary" bindtap="goGame" data-mode="pve">快速开始</view>
+      <view class="btn-ghost" bindtap="goMatch">大厅</view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-title">每日任务</view>
+    <view class="task-list">
+      <view class="task-item" tt:for="{{dailyTasks}}" tt:key="id">
+        <view class="task-check {{item.done ? 'done' : ''}}">{{item.done ? '✓' : ''}}</view>
+        <text class="task-text {{item.done ? 'task-done' : ''}}">{{item.text}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-title">好友在线</view>
+    <view class="friend-row">
+      <view class="friend-chip" tt:for="{{friends}}" tt:key="id" bindtap="goFriends">
+        <view class="friend-avatar" style="background:{{item.color}}">{{item.initial}}</view>
+        <text class="friend-name">{{item.name}}</text>
+        <view class="friend-dot {{item.status}}"></view>
+      </view>
+    </view>
+  </view>
+</view>

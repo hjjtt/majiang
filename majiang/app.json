@@ -1,0 +1,30 @@
+{
+  "pages": [
+    "pages/home/home",
+    "pages/match/match",
+    "pages/friends/friends",
+    "pages/history/history",
+    "pages/profile/profile",
+    "pages/game/game",
+    "pages/result/result"
+  ],
+  "window": {
+    "navigationBarTitleText": "霓虹立直",
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#ffffff"
+  },
+  "tabBar": {
+    "color": "#9b9fb0",
+    "selectedColor": "#0d8a6f",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
+    "list": [
+      { "pagePath": "pages/home/home", "text": "首页", "iconPath": "assets/tab-home.png", "selectedIconPath": "assets/tab-home-active.png" },
+      { "pagePath": "pages/match/match", "text": "对局", "iconPath": "assets/tab-match.png", "selectedIconPath": "assets/tab-match-active.png" },
+      { "pagePath": "pages/friends/friends", "text": "好友", "iconPath": "assets/tab-friends.png", "selectedIconPath": "assets/tab-friends-active.png" },
+      { "pagePath": "pages/history/history", "text": "战绩", "iconPath": "assets/tab-history.png", "selectedIconPath": "assets/tab-history-active.png" },
+      { "pagePath": "pages/profile/profile", "text": "我的", "iconPath": "assets/tab-profile.png", "selectedIconPath": "assets/tab-profile-active.png" }
+    ]
+  }
+}

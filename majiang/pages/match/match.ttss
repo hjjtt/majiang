@@ -1,0 +1,21 @@
+.page { padding: 24rpx 32rpx 40rpx; }
+.mode-bar { display: flex; gap: 16rpx; margin-bottom: 28rpx; }
+.mode-btn { flex: 1; text-align: center; padding: 20rpx; background: var(--card-bg); border: 1rpx solid var(--border); border-radius: var(--radius-sm); font-size: 28rpx; color: var(--text-dim); }
+.mode-btn.on { background: var(--green); color: #fff; font-weight: 600; border-color: var(--green); }
+.quick-start {
+  background: var(--green);
+  border-radius: var(--radius); padding: 36rpx 40rpx; display: flex; align-items: center; justify-content: space-between;
+  color: #fff; margin-bottom: 32rpx;
+}
+.qs-title { font-size: 34rpx; font-weight: 700; }
+.qs-sub { font-size: 24rpx; opacity: .8; margin-top: 6rpx; }
+.qs-arrow { font-size: 48rpx; }
+.room-list { display: flex; flex-direction: column; gap: 20rpx; }
+.room-card { background: var(--card-bg); border: 1rpx solid var(--border); border-radius: var(--radius); padding: 28rpx; display: flex; align-items: center; gap: 24rpx; }
+.room-icon { width: 80rpx; height: 80rpx; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 40rpx; }
+.room-info { flex: 1; }
+.room-name { font-size: 30rpx; font-weight: 600; }
+.room-meta { font-size: 24rpx; color: var(--text-dim); margin-top: 6rpx; }
+.room-right { text-align: right; }
+.room-fee { font-size: 32rpx; font-weight: 700; color: var(--gold); }
+.room-seats { font-size: 22rpx; color: var(--text-dim); margin-top: 4rpx; }

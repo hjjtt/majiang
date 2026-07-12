@@ -1,0 +1,12 @@
+<view class="page">
+  <view class="friend-list">
+    <view class="friend-card" tt:for="{{friends}}" tt:key="id">
+      <view class="friend-avatar" style="background:{{item.color}}">{{item.initial}}</view>
+      <view class="friend-info">
+        <view class="friend-name">{{item.name}}</view>
+        <view class="friend-games">对局 {{item.games}} 局</view>
+      </view>
+      <view class="friend-status {{item.status}}">{{item.status === 'online' ? '在线' : item.status === 'playing' ? '游戏中' : '离线'}}</view>
+    </view>
+  </view>
+</view>

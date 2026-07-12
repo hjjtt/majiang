@@ -1,0 +1,16 @@
+.page { min-height: 100vh; padding: 80rpx 32rpx 48rpx; display: flex; flex-direction: column; align-items: center; }
+.win-bg { background: linear-gradient(180deg, rgba(13,138,111,.12), var(--bg) 40%); }
+.lose-bg { background: linear-gradient(180deg, rgba(231,76,60,.08), var(--bg) 40%); }
+.result-banner { font-size: 72rpx; font-weight: 800; margin-bottom: 48rpx; }
+.banner-win { color: var(--green); }
+.banner-lose { color: var(--text-dim); }
+.result-card { background: var(--card-bg); border: 1rpx solid var(--border); border-radius: var(--radius); padding: 8rpx 36rpx; width: 100%; max-width: 600rpx; }
+.result-row { display: flex; justify-content: space-between; align-items: center; padding: 28rpx 0; border-bottom: 1rpx solid #f0f0f0; }
+.result-row:last-child { border-bottom: none; }
+.row-label { font-size: 28rpx; color: var(--text-dim); }
+.row-value { font-size: 34rpx; font-weight: 700; }
+.row-value.pos { color: var(--green); }
+.row-value.neg { color: var(--danger); }
+.result-actions { display: flex; flex-direction: column; gap: 20rpx; width: 100%; max-width: 600rpx; margin-top: 48rpx; }
+.btn-primary { background: var(--green); color: #fff; border-radius: 40rpx; padding: 24rpx; text-align: center; font-size: 32rpx; font-weight: 600; }
+.btn-ghost { border: 2rpx solid var(--green); color: var(--green); border-radius: 40rpx; padding: 22rpx; text-align: center; font-size: 32rpx; }

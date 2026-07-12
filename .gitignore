@@ -12,7 +12,6 @@ target/
 
 # TS 构建产物
 dist/
-majiang/js/
 
 # Maven classpath 输出（临时）
 server/cp.txt

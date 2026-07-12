@@ -1,0 +1,25 @@
+<view class="page">
+  <canvas id="gameCanvas" type="2d" class="game-canvas" bindtouchstart="onTouchStart"></canvas>
+
+  <view class="overlay-top">
+    <view class="round-badge">{{roundName}}</view>
+    <view class="timer">{{timer}}</view>
+  </view>
+
+  <view class="overlay-bottom" tt:if="{{showActions}}">
+    <view class="action-btn action-hu" bindtap="onHu" tt:if="{{canHu}}">胡</view>
+    <view class="action-btn action-gang" bindtap="onGang" tt:if="{{canGang}}">杠</view>
+    <view class="action-btn action-pong" bindtap="onPong" tt:if="{{canPong}}">碰</view>
+    <view class="action-btn action-riichi" bindtap="onRiichi" tt:if="{{canRiichi}}">立直</view>
+    <view class="action-btn action-pass" bindtap="onPass">过</view>
+  </view>
+
+  <view class="gameover-mask" tt:if="{{showResult}}">
+    <view class="gameover-card">
+      <view class="gameover-title">对局结束</view>
+      <view class="gameover-sub" tt:if="{{result.han}}">{{result.han}}番 {{result.fu}}符</view>
+      <view class="gameover-points" tt:if="{{result.points}}">{{result.points}}</view>
+      <view class="gameover-btn" bindtap="goResult">查看详情</view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,34 @@
+page {
+  /* 主色：唯一强调色（赌桌绿，品牌色） */
+  --green: #0d8a6f;
+  --green-dark: #0a7a4f;
+  /* 背景：纯白简约 */
+  --bg: #ffffff;
+  --bg-soft: #f8fafc;
+  /* 卡片 */
+  --card-bg: #ffffff;
+  --border: #e5e5e5;
+  /* 文字 */
+  --text: #0f172a;
+  --text-dim: #64748b;
+  /* 功能色 */
+  --gold: #d97706;
+  --danger: #dc2626;
+  /* 圆角 */
+  --radius: 24rpx;
+  --radius-sm: 12rpx;
+
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, "PingFang SC", "Helvetica Neue", sans-serif;
+  font-size: 28rpx;
+}
+view { box-sizing: border-box; }
+
+/* 通用卡片：白底 + 细描边（简约风用描边代阴影） */
+.card {
+  background: var(--card-bg);
+  border: 1rpx solid var(--border);
+  border-radius: var(--radius);
+}
+.card-bg { background: var(--card-bg); }

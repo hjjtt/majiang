@@ -1,0 +1,11 @@
+.page { padding: 24rpx 32rpx; }
+.friend-list { display: flex; flex-direction: column; gap: 20rpx; }
+.friend-card { background: var(--card-bg); border: 1rpx solid var(--border); border-radius: var(--radius); padding: 28rpx; display: flex; align-items: center; gap: 24rpx; }
+.friend-avatar { width: 80rpx; height: 80rpx; border-radius: 50%; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 32rpx; font-weight: 600; }
+.friend-info { flex: 1; }
+.friend-name { font-size: 30rpx; font-weight: 600; }
+.friend-games { font-size: 24rpx; color: var(--text-dim); margin-top: 6rpx; }
+.friend-status { font-size: 24rpx; padding: 8rpx 20rpx; border-radius: 999rpx; }
+.friend-status.online { background: rgba(13,138,111,.1); color: var(--green); }
+.friend-status.playing { background: rgba(217,119,6,.1); color: var(--gold); }
+.friend-status.offline { background: var(--bg-soft); color: var(--text-dim); }

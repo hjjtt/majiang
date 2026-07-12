@@ -1,0 +1,38 @@
+.page { width: 100vw; height: 100vh; position: relative; overflow: hidden; }
+.game-canvas { width: 100vw; height: 100vh; }
+.overlay-top {
+  position: absolute; top: 0; left: 0; right: 0;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 40rpx 32rpx 0;
+}
+.round-badge {
+  background: var(--green); color: #fff; border-radius: 999rpx;
+  padding: 10rpx 28rpx; font-size: 26rpx; font-weight: 600;
+}
+.timer {
+  background: #fff; color: var(--text); width: 56rpx; height: 56rpx;
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: 28rpx; font-weight: 700; border: 1rpx solid var(--border);
+}
+.overlay-bottom {
+  position: absolute; bottom: 60rpx; left: 0; right: 0;
+  display: flex; justify-content: center; gap: 20rpx; padding: 0 32rpx;
+}
+.action-btn {
+  min-width: 120rpx; padding: 20rpx 32rpx; border-radius: var(--radius-sm);
+  font-size: 32rpx; font-weight: 600; color: #fff; text-align: center;
+}
+.action-hu { background: var(--green); }
+.action-gang { background: var(--gold); }
+.action-pong { background: var(--danger); }
+.action-riichi { background: #2563eb; }
+.action-pass { background: rgba(15,23,42,.7); }
+.gameover-mask {
+  position: absolute; inset: 0; background: rgba(0,0,0,.5);
+  display: flex; align-items: center; justify-content: center;
+}
+.gameover-card { background: var(--card-bg); border: 1rpx solid var(--border); border-radius: var(--radius); padding: 48rpx 56rpx; text-align: center; min-width: 400rpx; }
+.gameover-title { font-size: 36rpx; font-weight: 700; }
+.gameover-sub { font-size: 28rpx; color: var(--text-dim); margin-top: 16rpx; }
+.gameover-points { font-size: 56rpx; font-weight: 700; color: var(--green); margin-top: 20rpx; }
+.gameover-btn { background: var(--green); color: #fff; border-radius: 999rpx; padding: 20rpx; margin-top: 32rpx; font-size: 30rpx; }

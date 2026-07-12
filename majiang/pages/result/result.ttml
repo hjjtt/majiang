@@ -1,0 +1,27 @@
+<view class="page {{isWin ? 'win-bg' : 'lose-bg'}}">
+  <view class="result-banner {{isWin ? 'banner-win' : 'banner-lose'}}">{{banner}}</view>
+
+  <view class="result-card">
+    <view class="result-row" tt:if="{{han > 0}}">
+      <text class="row-label">番数</text>
+      <text class="row-value">{{han}} 番</text>
+    </view>
+    <view class="result-row" tt:if="{{fu > 0}}">
+      <text class="row-label">符数</text>
+      <text class="row-value">{{fu}} 符</text>
+    </view>
+    <view class="result-row" tt:if="{{points !== 0}}">
+      <text class="row-label">得点</text>
+      <text class="row-value {{isWin ? 'pos' : 'neg'}}">{{isWin ? '+' : ''}}{{points}}</text>
+    </view>
+    <view class="result-row" tt:if="{{selfDraw}}">
+      <text class="row-label">方式</text>
+      <text class="row-value">自摸</text>
+    </view>
+  </view>
+
+  <view class="result-actions">
+    <view class="btn-primary" bindtap="playAgain">再来一局</view>
+    <view class="btn-ghost" bindtap="goHome">返回首页</view>
+  </view>
+</view>
