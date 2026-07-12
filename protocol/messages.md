@@ -111,7 +111,7 @@
 ```json
 { "type": "claim", "seq": 8, "data": { "action": "peng", "tiles": ["W4","W4"] } }
 ```
-- `action`: `"chi"` 吃 / `"peng"` 碰 / `"gang"` 杠 / `"hu"` 胡。
+- `action`: `"riichi"` 立直 / `"chi"` 吃 / `"peng"` 碰 / `"gang"` 杠 / `"hu"` 胡。
 - `tiles`: 该动作消耗/组成的牌。
 
 #### `claimResult` (S→C)
@@ -130,9 +130,17 @@
 ```json
 {
   "type": "gameOver", "seq": 10,
-  "data": { "winner": 1, "scores": { "0": -10, "1": 30, "2": -10, "3": -10 } }
+  "data": {
+    "winner": 1, "selfDraw": false,
+    "han": 2, "fu": 30, "points": 2000, "yaku": ["tanyao"],
+    "scores": { "0": -2000, "1": 2000, "2": 0, "3": 0 }
+  }
 }
 ```
+- `winner`: 胜者座位（`-1` 流局）。
+- `selfDraw`: 是否自摸（`false` = 荣和）。
+- `han` / `fu` / `points` / `yaku`: 番 / 符 / 赢家总点数 / 役名列表（流局或缺省时省略）。
+- `scores`: 各家点数变化（待前后端联调时对齐分摊细节）。
 
 ### 2.5 错误
 

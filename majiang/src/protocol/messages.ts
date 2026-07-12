@@ -33,7 +33,7 @@ export interface Envelope<T = unknown> {
 export type MatchMode = 'pvp' | 'pve' | 'mix';
 
 /** 声明动作类型 */
-export type ClaimAction = 'chi' | 'peng' | 'gang' | 'hu';
+export type ClaimAction = 'riichi' | 'chi' | 'peng' | 'gang' | 'hu';
 
 /** 座位玩家信息 */
 export interface PlayerInfo {
@@ -93,7 +93,12 @@ export interface ClaimResultData {
 }
 export interface GameOverData {
   winner: number;
-  scores: Record<string, number>;
+  selfDraw?: boolean;
+  han?: number;
+  fu?: number;
+  points?: number;
+  yaku?: string[];
+  scores?: Record<string, number>;
 }
 export interface ErrorData {
   code: string;
