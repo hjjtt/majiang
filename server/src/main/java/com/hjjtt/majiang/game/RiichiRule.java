@@ -109,6 +109,7 @@ public class RiichiRule implements MahjongRule {
         if (!canSplit(hand)) return yaku; // 不能胡 -> 无役
         if (isRiichi) yaku.add("riichi");
         if (isClosed && isSelfDraw) yaku.add("tsumo");
+        if (isRiichi && isSelfDraw) yaku.add("ippatsu"); // 简化：立直后自摸即一发（未跟踪立直后轮次）
         if (isAllSimple(hand)) yaku.add("tanyao");
         if (isClosed && isPinfu(hand)) yaku.add("pinfu");
         if (isAllTriplets(hand)) yaku.add("toitoi");
@@ -191,7 +192,7 @@ public class RiichiRule implements MahjongRule {
 
     private static int hanOf(String y) {
         return switch (y) {
-            case "riichi", "tsumo", "tanyao", "pinfu" -> 1;
+            case "riichi", "tsumo", "tanyao", "pinfu", "ippatsu" -> 1;
             case "toitoi", "chiitoitsu" -> 2;
             case "honitsu" -> 3;
             case "chinitsu" -> 6;

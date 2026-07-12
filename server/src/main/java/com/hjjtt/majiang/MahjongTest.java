@@ -44,11 +44,11 @@ public class MahjongTest {
         chk("toitoi.han", s4.han(), 2);
         chk("toitoi.points", s4.totalPoints(), 2000);
 
-        // 5. 立直+门前自摸+断幺九（子家）
-        chk("riichi.yaku", r.findYaku(tanyao, true, true, true), List.of("riichi","tsumo","tanyao"));
+        // 5. 立直+门前自摸+断幺九（子家，含一发）
+        chk("riichi.yaku", r.findYaku(tanyao, true, true, true), List.of("riichi","tsumo","ippatsu","tanyao"));
         Score s5 = r.score(tanyao, true, true, true, false, false);
-        chk("riichi.han", s5.han(), 3);
-        chk("riichi.points", s5.totalPoints(), 3900);
+        chk("riichi.han", s5.han(), 4);
+        chk("riichi.points", s5.totalPoints(), 7700);
 
         // 6. 无役 -> 不可胡（score 返回 null）
         List<String> noYaku = List.of("W1","W2","W3","W4","W5","W6","T7","T8","T9","D1","D2","D3","J1","J1");
