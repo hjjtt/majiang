@@ -20,6 +20,7 @@ public class RuleGuardTest {
     public static void main(String[] args) throws Exception {
         testRiichiLock();
         testFuriten();
+        testTsumo();
         System.out.println("\n==== " + pass + " pass, " + fail + " fail ====");
         if (fail > 0) System.exit(1);
     }
@@ -46,6 +47,26 @@ public class RuleGuardTest {
         CapturePlayer p0 = player(g, 0);
         g.claim(0, "hu", null); // 荣和 D7 但 D7 在自己弃牌 -> 振听
         chk("furiten.error", code(p0), "FURITEN");
+    }
+
+    static void testTsumo() throws Exception {
+        Game g = newGame();
+        setField(g, "dealer", 1);                       // 座位 0 子家
+        setField(g, "phase", Game.Phase.PLAYING);
+        setField(g, "currentSeat", 0);
+        setArr(g, "hands", 0, new ArrayList<>(List.of(
+                "W2","W2","W2","W3","W4","W5","T5","T6","T7","D4","D5","D6","D7","D7")));
+        CapturePlayer p0 = player(g, 0);
+        g.claim(0, "hu", null);                         // 自摸胡（tsumo+tanyao）
+        Message last = p0.last;
+        boolean ok = last != null && "gameOver".equals(last.getType())
+                && Integer.valueOf(0).equals(last.getData().get("winner"))
+                && Integer.valueOf(2).equals(last.getData().get("han"))
+                && Integer.valueOf(2000).equals(last.getData().get("points"));
+        System.out.println((ok ? "PASS " : "FAIL ") + "tsumo.selfDraw han=" +
+                (last == null ? null : last.getData().get("han")) + " points=" +
+                (last == null ? null : last.getData().get("points")));
+        if (ok) pass++; else fail++;
     }
 
     // ---- helpers ----

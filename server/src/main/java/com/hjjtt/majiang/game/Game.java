@@ -155,9 +155,15 @@ public class Game {
                     Map.of("ok", true, "action", "riichi", "seat", seat)));
             return;
         }
-        if (phase != Phase.WAITING_ACTION) return;
         if ("hu".equalsIgnoreCase(action)) {
-            // 振听：自己曾弃过的牌不能荣和
+            // 自摸：自己回合摸牌后声明胡
+            if (phase == Phase.PLAYING && seat == currentSeat) {
+                List<String> hm = new ArrayList<>(hands[seat]);
+                if (rule.canHu(hm, null) && rule.hasYaku(hm, riichi[seat], true, true)) settleWin(seat, true);
+                return;
+            }
+            // 荣和：点炮牌
+            if (phase != Phase.WAITING_ACTION) return;
             if (discards[seat].contains(lastDiscardTile)) {
                 seats[seat].send(Message.reply(0, MessageType.ERROR,
                         Map.of("code", "FURITEN", "message", "振听：不能荣和曾弃过的牌")));
