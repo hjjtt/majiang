@@ -15,4 +15,9 @@ public interface MahjongRule {
      * @param missingSuit 缺门花色（"W"/"T"/"D"）；四川血战胡牌时手牌不得含缺门花色，null 表示无缺门要求
      */
     boolean canHu(List<String> hand, String missingSuit);
+
+    /** 是否有至少 1 役（日麻胡牌需有役）。默认 true 兼容占位规则。 */
+    default boolean hasYaku(List<String> hand, boolean isRiichi, boolean isSelfDraw, boolean isClosed) {
+        return true;
+    }
 }

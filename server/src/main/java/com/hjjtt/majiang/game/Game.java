@@ -117,7 +117,7 @@ public class Game {
         if (phase != Phase.PLAYING || seat != currentSeat) return;
         List<String> h = hands[seat];
         if (h.isEmpty()) return;
-        if (rule.canHu(new ArrayList<>(h), missingSuits[seat])) { settleWin(seat); return; }
+        if (rule.canHu(new ArrayList<>(h), missingSuits[seat]) && rule.hasYaku(new ArrayList<>(h), false, true, true)) { settleWin(seat); return; }
         discard(seat, aiPick(seat));
     }
 
@@ -137,7 +137,7 @@ public class Game {
         if ("hu".equalsIgnoreCase(action)) {
             List<String> h = new ArrayList<>(hands[seat]);
             h.add(lastDiscardTile);
-            if (rule.canHu(h, missingSuits[seat])) settleWin(seat);
+            if (rule.canHu(h, missingSuits[seat]) && rule.hasYaku(h, false, false, true)) settleWin(seat);
         }
     }
 
