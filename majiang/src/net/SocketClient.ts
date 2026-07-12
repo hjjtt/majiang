@@ -1,13 +1,5 @@
 import type { Envelope } from '../protocol/messages';
 
-/**
- * 抖音小游戏 tt 全局对象的最小声明（仅覆盖用到的 API）。
- * TODO: 替换为官方 minigame-api 类型定义。
- */
-declare const tt: {
-  connectSocket(opts: { url: string }): SocketTask;
-};
-
 /** tt.connectSocket 返回的 Socket 任务对象。 */
 interface SocketTask {
   send(opts: { data: string }): void;
@@ -35,7 +27,7 @@ export class SocketClient {
   /** 连接 WebSocket 服务，握手成功后 resolve。 */
   connect(url: string): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      const socket = tt.connectSocket({ url });
+      const socket = tt.connectSocket({ url }) as SocketTask;
       this.socket = socket;
       socket.onOpen(() => resolve());
       socket.onError((err) => reject(err));

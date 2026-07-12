@@ -1,0 +1,14 @@
+{
+  "name": "majiang",
+  "version": "0.1.0",
+  "private": true,
+  "description": "抖音麻将小游戏（原生项目 + TypeScript）",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0"
+  }
+}

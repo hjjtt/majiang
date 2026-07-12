@@ -1,14 +1,13 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "module": "ES2020",
+    "target": "ES2017",
+    "module": "CommonJS",
     "moduleResolution": "Node",
-    "lib": ["ES2020", "DOM"],
+    "lib": ["ES2017", "DOM"],
     "strict": true,
     "noUnusedLocals": true,
-    "declaration": true,
     "sourceMap": true,
-    "outDir": "dist",
+    "outDir": "js",
     "rootDir": "src",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,

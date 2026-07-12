@@ -12,3 +12,4 @@ target/
 
 # TS 构建产物
 dist/
+majiang/js/

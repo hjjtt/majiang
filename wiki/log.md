@@ -34,16 +34,22 @@
 - 决策：人机对战（1真人+3AI）与联网对战复用同一套 Game，靠 `Player` 接口抽象
 - 下一步：前端 `client-ts/` 层 + 麻将规则选型
 
-## [2026-07-12] ingest | 搭建前端 TS 逻辑层
+## [2026-07-12] ingest | 搭建前端 TS 逻辑层（client-ts，后已并入 majiang）
 
-- 新增页面：
-  - [[summary-client-ts]]：前端 TS 逻辑层（协议类型 + tt.connectSocket 封装 + GameClient）
-- 项目产出 `client-ts/`：
-  - `src/protocol/messages.ts`：消息类型常量 + 信封 + 各 data 类型（与后端 messages.md 对齐）
-  - `src/net/SocketClient.ts`：tt.connectSocket 封装（connect / request 序列号配对 / send / on 订阅）
-  - `src/game/GameClient.ts`：高层门面（login / match / discard / claim + 牌局事件订阅）
-  - `package.json` + `tsconfig.json`（ES2020+DOM，strict）
-- 验证：`npm install` + `tsc --noEmit` ✅ 通过；`tsc` 生成 `dist/` ✅
-- 设计：seq 自动配对请求-响应；GameClient 作为 Cocos 脚本的唯一交互门面；`declare const tt` 占位
-- 边界说明：Cocos Creator 场景/UI 骨架需编辑器创建，client-ts 是不依赖编辑器的逻辑层，待接入
-- 知识页累计 4 个（overview/concept-player/summary-protocol/summary-client-ts），graph.md 仍待 ≥5
+- 新增页面：[[summary-client-ts]]（前端 TS 逻辑层）
+- 项目产出 `client-ts/`：messages.ts / SocketClient.ts / GameClient.ts，tsc 编译通过
+- 边界说明：Cocos Creator 场景/UI 骨架需编辑器创建
+- ⚠️ 本条所述 `client-ts/` 在后续 update 中已并入 `majiang/src/`，页面改名为 [[summary-frontend]]
+
+## [2026-07-12] update | 前端改用原生小游戏 + TS（弃 Cocos，并入 client-ts）
+
+- 决策：前端不使用 Cocos Creator，改用 `majiang/` 原生抖音小游戏项目 + TypeScript
+  - 原因：用户选择直接在原生项目开发，无需 Cocos 编辑器，界面与逻辑可在此编写
+- 结构变更：
+  - `client-ts/src/` 三个文件（messages/SocketClient/GameClient）迁入 `majiang/src/{protocol,net,game}/`，`client-ts/` 目录删除
+  - `majiang/` 加 `tsconfig.json`（CommonJS, outDir=js, rootDir=src, strict, lib ES2017+DOM）、`package.json`
+  - 新增 `majiang/src/main.ts`（应用入口：画布 + 连接 + 登录 + 匹配）、`src/scene/board.ts`（牌桌绘制骨架）、`src/types/tt.d.ts`（tt 全局声明）
+  - `game.js` 改为 `require('./js/main')`，原模板代码替换
+- 验证：`npm install` + `tsc --noEmit` ✅；`tsc` 生成 `js/` 产物 ✅
+- wiki：`summary-client-ts.md` 改名为 [[summary-frontend]]（内容更新为 majiang/src 说明），overview/index 同步刷新
+- 待办：前后端联调（抖音开发者工具实跑）、麻将规则选型、牌桌 UI 细化
