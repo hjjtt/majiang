@@ -53,3 +53,22 @@
 - 验证：`npm install` + `tsc --noEmit` ✅；`tsc` 生成 `js/` 产物 ✅
 - wiki：`summary-client-ts.md` 改名为 [[summary-frontend]]（内容更新为 majiang/src 说明），overview/index 同步刷新
 - 待办：前后端联调（抖音开发者工具实跑）、麻将规则选型、牌桌 UI 细化
+
+## [2026-07-12] ingest | 目标架构设计 + 三项关键决策
+
+- 新增 [[summary-architecture]]：用户提供的目标架构（Spring Boot + Redis + MySQL + WebSocket，含模块/状态机/动作仲裁/胡牌判定）
+- 三项决策（用户拍板）：
+  1. 前端：回到 Cocos Creator 3.x（原生 TS 的 UI 工作废弃，逻辑层 messages/SocketClient/GameClient 可迁入 Cocos）
+  2. 后端：分阶段--阶段1 单机可玩(Netty 核心)，阶段2 上 Spring Boot + Redis/MySQL
+  3. 规则：四川血战（108 张，缺一门）
+- 推回：Spring Boot 2.7+ 建议升 3.x；分布式组件阶段2 再引入
+- 下一步：阶段1 实现游戏核心（牌墙/状态机/动作仲裁/胡牌判定），纯后端不依赖前端
+
+## [2026-07-12] update | 日麻核心可玩完成
+
+- 规则切换：四川血战(108 张) -> 日麻(136 张，W/T/D 数牌 + J1-7 字牌)
+- `RiichiRule`：胡牌判定(4面子1将/七对/国士/九莲/绿一色)、12 役(立直/门前清自摸/断幺九/平和近似/对对和/七对/混一色/清一色/字一色/国士/九莲/绿一色)、点数(符 30/七对 25 + 番对应基本点 + 满贯及以上档位 + 庄家 3B/子家 4B)
+- `MahjongRule` 接口加 `findYaku`/`score` 默认方法 + `Score` record(han,fu,basePoints,totalPoints,yaku)
+- `Game`：清理四川血战遗留 `missingSuits`；加 `riichi[]` 状态 + `claim("riichi")` 声明；`settleWin` 算分并广播 han/fu/points/yaku
+- 验证：`MahjongTest` 17/17 pass（役 + 点数）；`GameRunTest` 4 AI 跑通一局 SETTLED
+- 待补：杠/碰仲裁、一发/里宝牌/宝牌、符精确计算、平和严格结构校验

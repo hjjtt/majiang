@@ -8,10 +8,16 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * 日麻（立直麻将）胡牌判定。
+ * 日麻（立直麻将）胡牌判定 + 役种 + 计分。
  * 136 张（数牌万条筒 + 字牌东南西北中发白）。
- * 胡牌型：4面子+1将 / 七对 / 国士无双 / 九莲宝灯 / 绿一色（特殊形待补）。
+ * 胡牌型：4面子+1将 / 七对 / 国士无双 / 九莲宝灯 / 绿一色。
  * 字牌只能刻子/将，不能顺子。
+ *
+ * 核心可玩版范围：
+ *   役 = 立直 / 门前清自摸和 / 断幺九 / 平和(近似) / 对对和 / 七对子 /
+ *         混一色 / 清一色 / 字一色(役满) / 国士无双(役满) / 九莲宝灯(役满) / 绿一色(役满)
+ *   计分 = 符固定(30/七对25) + 番对应基本点 + 满贯及以上档位 + 庄家3B/子家4B。
+ *   未实现：符精确计算、一发/里宝牌/宝牌、平和严格结构校验、杠。
  */
 public class RiichiRule implements MahjongRule {
 
@@ -41,6 +47,7 @@ public class RiichiRule implements MahjongRule {
     private static final java.util.Set<String> TERMINALS_HONORS = java.util.Set.of(
             "W1","W9","T1","T9","D1","D9","J1","J2","J3","J4","J5","J6","J7");
     private static final java.util.Set<String> GREEN = java.util.Set.of("T2","T3","T4","T6","T8","J6");
+    private static final java.util.Set<String> YAKUMAN = java.util.Set.of("kokushi","chuuren","ryuuiisou","tsuiso");
 
     /** 国士无双：13 种幺九牌各 1 + 任 1 种重复。 */
     private boolean isKokushi(List<String> hand) {
@@ -88,17 +95,26 @@ public class RiichiRule implements MahjongRule {
         return canSplit(hand);
     }
 
-    /** 是否有至少 1 役。核心可玩版：立直/门前清自摸/断幺九/清一色/混一色/字一色/特殊形。 */
+    // ===== 役种 =====
+
+    /** 返回命中的役名列表（空表 = 无役）。役满单独返回不叠加普通役。 */
     @Override
-    public boolean hasYaku(List<String> hand, boolean isRiichi, boolean isSelfDraw, boolean isClosed) {
-        if (isRiichi) return true;
-        if (isClosed && isSelfDraw) return true;
-        if (isAllSimple(hand)) return true;
-        if (isChinitsu(hand)) return true;
-        if (isHonitsu(hand)) return true;
-        if (isTsuiso(hand)) return true;
-        if (isSevenPairs(hand) || isKokushi(hand) || isChuuren(hand) || isRyuuiisou(hand)) return true;
-        return false;
+    public List<String> findYaku(List<String> hand, boolean isRiichi, boolean isSelfDraw, boolean isClosed) {
+        List<String> yaku = new ArrayList<>();
+        if (isKokushi(hand)) { yaku.add("kokushi"); return yaku; }
+        if (isChuuren(hand)) { yaku.add("chuuren"); return yaku; }
+        if (isRyuuiisou(hand)) { yaku.add("ryuuiisou"); return yaku; }
+        if (isTsuiso(hand)) { yaku.add("tsuiso"); return yaku; }
+        if (isSevenPairs(hand)) { yaku.add("chiitoitsu"); return yaku; }
+        if (!canSplit(hand)) return yaku; // 不能胡 -> 无役
+        if (isRiichi) yaku.add("riichi");
+        if (isClosed && isSelfDraw) yaku.add("tsumo");
+        if (isAllSimple(hand)) yaku.add("tanyao");
+        if (isClosed && isPinfu(hand)) yaku.add("pinfu");
+        if (isAllTriplets(hand)) yaku.add("toitoi");
+        if (isChinitsu(hand)) yaku.add("chinitsu");
+        else if (isHonitsu(hand)) yaku.add("honitsu");
+        return yaku;
     }
 
     /** 断幺九：无 1/9/字牌。 */
@@ -109,6 +125,38 @@ public class RiichiRule implements MahjongRule {
             if (r == 1 || r == 9) return false;
         }
         return true;
+    }
+
+    /** 平和（近似）：门前 + 无字牌 + 无刻子 + 单一对子为 2-8 数牌。 */
+    private boolean isPinfu(List<String> hand) {
+        Map<String, Integer> cnt = new HashMap<>();
+        for (String t : hand) {
+            if (isHonor(t)) return false;
+            cnt.merge(t, 1, Integer::sum);
+        }
+        String pair = null;
+        int pairs = 0;
+        for (var e : cnt.entrySet()) {
+            int c = e.getValue();
+            if (c >= 3) return false; // 无刻子
+            if (c == 2) { pairs++; pair = e.getKey(); }
+        }
+        if (pairs != 1) return false;
+        int r = rank(pair);
+        return r >= 2 && r <= 8; // 将为 2-8（非役牌）
+    }
+
+    /** 对对和：4 刻子 + 1 将（每值张数为 3，恰好一对为 2）。 */
+    private boolean isAllTriplets(List<String> hand) {
+        if (hand.size() != 14) return false;
+        Map<String, Integer> cnt = new HashMap<>();
+        for (String t : hand) cnt.merge(t, 1, Integer::sum);
+        int pairs = 0;
+        for (int c : cnt.values()) {
+            if (c == 2) pairs++;
+            else if (c != 3) return false; // 1 或 4 张无法纯刻子
+        }
+        return pairs == 1;
     }
 
     /** 清一色：全同一种数牌花色。 */
@@ -138,6 +186,49 @@ public class RiichiRule implements MahjongRule {
         for (String t : hand) if (!isHonor(t)) return false;
         return true;
     }
+
+    // ===== 计分 =====
+
+    private static int hanOf(String y) {
+        return switch (y) {
+            case "riichi", "tsumo", "tanyao", "pinfu" -> 1;
+            case "toitoi", "chiitoitsu" -> 2;
+            case "honitsu" -> 3;
+            case "chinitsu" -> 6;
+            default -> 13; // 役满
+        };
+    }
+
+    private int countHan(List<String> yaku) {
+        if (yaku.isEmpty()) return 0;
+        for (String y : yaku) if (YAKUMAN.contains(y)) return 13; // 役满不叠加
+        int s = 0;
+        for (String y : yaku) s += hanOf(y);
+        return s;
+    }
+
+    @Override
+    public Score score(List<String> hand, boolean isRiichi, boolean isSelfDraw, boolean isClosed,
+                       boolean winnerIsDealer, boolean isRon) {
+        List<String> yaku = findYaku(hand, isRiichi, isSelfDraw, isClosed);
+        if (yaku.isEmpty()) return null; // 无役不可胡
+        int han = countHan(yaku);
+        int fu = yaku.contains("chiitoitsu") ? 25 : 30;
+        int base;
+        if (han >= 13) base = 8000;       // 役满
+        else if (han >= 11) base = 6000;  // 三倍满
+        else if (han >= 8) base = 4000;   // 倍满
+        else if (han >= 6) base = 3000;   // 跳满
+        else if (han >= 5) base = 2000;   // 满贯
+        else base = Math.min(fu * (1 << (han + 2)), 2000);
+        // 庄家赢 3B，子家赢 4B（自摸分摊与荣和点炮总额一致）
+        int total = roundUp100(winnerIsDealer ? base * 3 : base * 4);
+        return new Score(han, fu, base, total, yaku);
+    }
+
+    private static int roundUp100(int x) { return ((x + 99) / 100) * 100; }
+
+    // ===== 手牌拆分（4面子+1将） =====
 
     private boolean canSplit(List<String> hand) {
         Map<String, List<Integer>> groups = new TreeMap<>();

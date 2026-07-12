@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -28,7 +29,8 @@ public class Game {
 
     private Wall wall;
     private final List<String>[] hands = new List[4];
-    private final String[] missingSuits = new String[4];
+    /** 每个座位是否已声明立直。 */
+    private final boolean[] riichi = new boolean[4];
     private int currentSeat = 0;
     private int dealer = 0;
     private static final long ACTION_TIMEOUT_MS = 100L;
@@ -117,27 +119,35 @@ public class Game {
         if (phase != Phase.PLAYING || seat != currentSeat) return;
         List<String> h = hands[seat];
         if (h.isEmpty()) return;
-        if (rule.canHu(new ArrayList<>(h), missingSuits[seat]) && rule.hasYaku(new ArrayList<>(h), false, true, true)) { settleWin(seat); return; }
+        if (rule.canHu(new ArrayList<>(h), null) && rule.hasYaku(new ArrayList<>(h), riichi[seat], true, true)) { settleWin(seat, true); return; }
         discard(seat, aiPick(seat));
     }
 
-    /** AI 选牌：优先打缺门花色，否则随机。 */
+    /** AI 选牌：随机打出一张。 */
     private String aiPick(int seat) {
         List<String> h = hands[seat];
-        String miss = missingSuits[seat];
-        if (miss != null) {
-            for (String t : h) if (t.startsWith(miss)) return t;
-        }
         return h.get(new java.util.Random().nextInt(h.size()));
     }
 
-    /** 玩家声明动作（胡/碰/杠/过）。碰/杠骨架阶段暂未实现，靠超时流转。 */
+    /**
+     * 玩家声明动作：
+     *   riichi - 自己回合声明立直（PLAYING 阶段）
+     *   hu     - 荣和点炮牌（WAITING_ACTION 阶段）
+     * 碰/杠/过暂未实现，靠超时流转。
+     */
     public synchronized void claim(int seat, String action, List<String> tiles) {
+        if ("riichi".equalsIgnoreCase(action)) {
+            if (phase != Phase.PLAYING || seat != currentSeat) return;
+            riichi[seat] = true;
+            seats[seat].send(Message.reply(0, MessageType.CLAIM_RESULT,
+                    Map.of("ok", true, "action", "riichi", "seat", seat)));
+            return;
+        }
         if (phase != Phase.WAITING_ACTION) return;
         if ("hu".equalsIgnoreCase(action)) {
             List<String> h = new ArrayList<>(hands[seat]);
             h.add(lastDiscardTile);
-            if (rule.canHu(h, missingSuits[seat]) && rule.hasYaku(h, false, false, true)) settleWin(seat);
+            if (rule.canHu(h, null) && rule.hasYaku(h, riichi[seat], false, true)) settleWin(seat, false);
         }
     }
 
@@ -148,12 +158,26 @@ public class Game {
         nextTurn();
     }
 
-    /** 胡牌结算。 */
-    private void settleWin(int winner) {
+    /** 胡牌结算：算分并广播。isSelfDraw=true 自摸，false 荣和。 */
+    private void settleWin(int winner, boolean isSelfDraw) {
+        List<String> winHand = new ArrayList<>(hands[winner]);
+        if (!isSelfDraw) winHand.add(lastDiscardTile);
+        Score sc = rule.score(winHand, riichi[winner], isSelfDraw, true,
+                winner == dealer, !isSelfDraw);
         phase = Phase.SETTLED;
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("winner", winner);
+        data.put("selfDraw", isSelfDraw);
+        if (sc != null) {
+            data.put("han", sc.han());
+            data.put("fu", sc.fu());
+            data.put("points", sc.totalPoints());
+            data.put("yaku", sc.yaku());
+        }
         for (int s = 0; s < 4; s++)
-            seats[s].send(Message.reply(0, MessageType.GAME_OVER, Map.of("winner", winner)));
-        log.info("[{}] 胡牌结算 winner={}", roomId, winner);
+            seats[s].send(Message.reply(0, MessageType.GAME_OVER, data));
+        log.info("[{}] 胡牌结算 winner={} han={} points={}", roomId, winner,
+                sc == null ? 0 : sc.han(), sc == null ? 0 : sc.totalPoints());
         scheduler.shutdown();
     }
 

@@ -3,21 +3,26 @@ package com.hjjtt.majiang.game;
 import java.util.List;
 
 /**
- * 麻将规则抽象（策略模式）。具体规则实现此接口。
- * 四川血战实现见 SichuanBloodRule。
+ * 麻将规则抽象。核心可玩日麻由 {@link RiichiRule} 实现。
  */
 public interface MahjongRule {
 
-    /**
-     * 判断手牌是否构成胡牌。
-     *
-     * @param hand        手牌（胡牌时为 3n+2 张）
-     * @param missingSuit 缺门花色（"W"/"T"/"D"）；四川血战胡牌时手牌不得含缺门花色，null 表示无缺门要求
-     */
+    /** 能否胡牌（4面子1将 / 七对 / 国士 / 九莲 / 绿一色）。 */
     boolean canHu(List<String> hand, String missingSuit);
 
-    /** 是否有至少 1 役（日麻胡牌需有役）。默认 true 兼容占位规则。 */
+    /** 是否有至少 1 役（日麻胡牌需有役）。委托 {@link #findYaku}。 */
     default boolean hasYaku(List<String> hand, boolean isRiichi, boolean isSelfDraw, boolean isClosed) {
-        return true;
+        return !findYaku(hand, isRiichi, isSelfDraw, isClosed).isEmpty();
+    }
+
+    /** 返回该手牌命中的全部役名（空表 = 无役，不可胡）。默认无役。 */
+    default List<String> findYaku(List<String> hand, boolean isRiichi, boolean isSelfDraw, boolean isClosed) {
+        return List.of();
+    }
+
+    /** 计分。默认返回 null 表示规则未实现计分。 */
+    default Score score(List<String> hand, boolean isRiichi, boolean isSelfDraw, boolean isClosed,
+                        boolean winnerIsDealer, boolean isRon) {
+        return null;
     }
 }
